@@ -1,17 +1,29 @@
 from setuptools import setup, find_packages
 
+VERSION = '0.3'
+DESCRIPTION = 'Package that wraps the python-telegram-bot library to make broadcasting easier.'
+
 setup(
     name='python-telegram-broadcast',
-    version='0.1',
+    version=VERSION,
     packages=find_packages(),
-    description='Package that wraps the python-telegram-bot library to make broadcasting easier.',
+    description=DESCRIPTION,
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    author='Jonah Whaler',
+    author='jonah_whaler_2348',
     author_email='jk_saga@proton.me',
     license='MIT',
     install_requires=[
         "python-telegram-bot==21.1.1",
         "mypy"
+    ],
+    keywords=[
+        'python', 'telegram', 'broadcast', 'bot'
+    ],
+    classifiers=[
+        "Development Status :: 1 - Planning",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.10",
     ]
 )
