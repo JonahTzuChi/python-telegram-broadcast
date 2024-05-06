@@ -1,11 +1,10 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.3'
 DESCRIPTION = 'Package that wraps the python-telegram-bot library to make broadcasting easier.'
 
 setup(
     name='python-telegram-broadcast',
-    version=VERSION,
+    version='0.4',
     packages=find_packages(),
     description=DESCRIPTION,
     long_description=open('README.md').read(),
