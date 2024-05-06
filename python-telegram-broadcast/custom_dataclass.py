@@ -8,7 +8,7 @@ class BroadcastStats:
     """
     A data class that stores statistics about a broadcast operation.
 
-    Attributes:
+    Parameters:
     -----------
     n_job : int
         The number of jobs that are expected to be sent, default to 0.
@@ -40,7 +40,7 @@ class ErrorInformation:
     """
     A data class that stores information about an error that occurred.
 
-    Attributes:
+    Parameters:
     -----------
     error_type: str
         The type of the error that occurred.
@@ -60,7 +60,7 @@ class JobResponse:
     """
     A data class that stores information about a job that is sent.
 
-    Attributes:
+    Parameters:
     -----------
     telegram_id : int
         The telegram id of the receiver.
