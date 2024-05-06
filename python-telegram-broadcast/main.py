@@ -95,7 +95,8 @@ async def async_broadcast_with_multiprocessing(
     Broadcasts a message to multiple subscribers using multiple processes.
 
     Args:
-        subscribers (list[Tuple[int, str]]): A list of tuples containing the telegram_id and username of the subscribers.
+        subscribers (list[Tuple[int, str]]):
+            A list of tuples containing the telegram_id and username of the subscribers.
         bot_token (str): The token of the Telegram bot.
         method (Callable[..., Coroutine]): The method to be called for sending the message.
         content (str): The content of the message.
