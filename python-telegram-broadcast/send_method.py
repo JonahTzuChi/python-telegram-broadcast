@@ -1,5 +1,7 @@
 import asyncio
 import time
+import traceback
+from enum import Enum
 
 import telegram
 from telegram import Message, PhotoSize, Document, Video
@@ -7,7 +9,33 @@ from telegram.constants import ParseMode
 from telegram.error import TelegramError, RetryAfter, TimedOut, Forbidden, BadRequest
 
 from .custom_exception import ExceedMaxRetriesError, TelegramSendError
-from .custom_dataclass import BroadcastMethod
+from .custom_dataclass import ErrorInformation
+from typing import Any, Callable, Coroutine, Union
+
+BroadcastMethodReturnTypeHint = Union[
+    telegram.Message, telegram.PhotoSize, telegram.Document, telegram.Video, ErrorInformation
+]
+BroadcastMethodTypeHint = Callable[
+    [telegram.Bot, int, str, str, float, int, int],
+    Coroutine[Any, Any, Message | PhotoSize | Document | Video | ErrorInformation]
+]
+
+
+class BroadcastMethodType(Enum):
+    """
+    An enumeration class that stores the types of broadcast methods.
+    """
+    TEXT = "Text"
+    PHOTO = "Photo"
+    DOCUMENT = "Document"
+    VIDEO = "Video"
+
+
+def string_to_BroadcastMethodType(enum_value: str):
+    try:
+        return BroadcastMethodType[enum_value]
+    except ValueError:
+        raise
 
 
 async def sendMessage(
@@ -304,28 +332,73 @@ async def sendDocument(
 
 
 def select_broadcast_method(
-        dtype: str
-) -> BroadcastMethod:
+    dtype: BroadcastMethodType = BroadcastMethodType.TEXT
+) -> BroadcastMethodTypeHint:
     """
     Selects the appropriate broadcast method based on the given dtype.
 
     Parameters:
     -------
-    - dtype (str): The type of broadcast message.
+    - dtype (BroadcastMethodType): The type of broadcast message.
 
     Returns:
     -------
     - BroadcastMethodType: The selected broadcast method.
 
+    Raises:
+    -------
+    ValueError: If an invalid dtype is provided.
+
     Notes:
     -------
-    - Acceptable `dtype`: "Photo", "Document" and "Video".
-    - If `dtype` is not one of the above, the `sendMessage` method will be returned.
+    - Default dtype is TEXT.
     """
-    if dtype == "Photo":
+    if dtype == BroadcastMethodType.PHOTO:
         return sendPhoto
-    if dtype == "Document":
+    if dtype == BroadcastMethodType.DOCUMENT:
         return sendDocument
-    if dtype == "Video":
+    if dtype == BroadcastMethodType.VIDEO:
         return sendVideo
-    return sendMessage
+    if dtype == BroadcastMethodType.TEXT:
+        return sendMessage
+    raise ValueError(f"Invalid dtype: {dtype}")
+
+
+def broadcast_method_wrapper(
+        method: BroadcastMethodTypeHint,
+        bot_token: str, target_id: int, payload: str, caption: str,
+        seconds: float, max_retry: int
+) -> BroadcastMethodReturnTypeHint:
+    """
+    This function is a wrapper for the broadcast method.
+    It creates a new event loop, sets it as the current event loop,
+    and then runs the broadcast method until it completes.
+    The broadcast method is expected to be a coroutine function.
+
+    Parameters:
+    ----------
+    - method (BroadcastMethod): Broadcast method to be called.
+    - bot_token (str): The token of the Telegram bot.
+    - target_id (int): The ID of the target to which the message will be sent.
+    - payload (str): The payload to be sent.
+    - caption (str): The caption for the payload.
+    - seconds (float): The number of seconds to wait before sending the message.
+    - max_retry (int): The maximum number of times to retry sending the message in case of failure.
+
+    Returns:
+    -------
+    - BroadcastMethodReturnType: The return value of the broadcast method.
+
+    Notes:
+    ------
+    - Unpack the exception object to get the ErrorInformation.
+    """
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        my_bot = telegram.Bot(token=bot_token)
+        return loop.run_until_complete(
+            method(my_bot, target_id, payload, caption, seconds, 0, max_retry)
+        )
+    except Exception as error:
+        return ErrorInformation(type(error).__name__, str(error), traceback.format_exc())
