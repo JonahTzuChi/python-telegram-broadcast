@@ -1,14 +1,14 @@
 from queue import Queue
 from typing import NoReturn
 
-from .custom_data_class import JobSentInformation, BroadcastStats
+from .custom_dataclass import JobResponse, BroadcastStats, ErrorInformation
 
 
 def write_sent_result(
-        log_sheet_path: str, job_information_list: list[JobSentInformation], content: str
+        log_sheet_path: str, job_response_list: list[JobResponse], payload: str
 ) -> NoReturn:
     """
-    Writes the result of sent jobs to a log file. It iterates over a list of JobSentInformation objects,
+    Writes the result of sent jobs to a log file. It iterates over a list of JobResponse objects,
     which contain information about each job that was sent.
     For each job, it writes the job's information to the log file.
 
@@ -16,50 +16,38 @@ def write_sent_result(
     ----------
     log_sheet_path : str
         The path to the log file where the job information will be written.
-    job_information_list : list[JobSentInformation]
-        A list of JobSentInformation objects, each representing a job that was sent.
-    content : str
-        The content that was expected to be sent in each job.
+    job_response_list : list[JobResponse]
+        A list of JobResponse objects, each representing a job that was sent.
+    payload : str
+        The payload that was expected to be sent in each job.
 
     Returns:
     -------
     NoReturn
-
-    Notes:
-    ------
-    - TODO: Handle situations where the result is ApplyResult.
     """
     with open(log_sheet_path, "a") as file:
-        file.write(f"Content:{content}\n")
-        for jsi in job_information_list:
-            file.write(f"{jsi.dump()}\n")
+        file.write(f"Payload: {payload}\n")
+        for jr in job_response_list:
+            file.write(f"{jr.dump()}\n")
 
 
-def group_by_result(
-        result_queue: Queue[JobSentInformation], is_apply_result: bool
-) -> tuple[list[JobSentInformation], list[JobSentInformation]]:
+def separate_result_queue(result_queue: Queue[JobResponse]) -> tuple[list[JobResponse], list[JobResponse]]:
     sent_list, failed_list = list(), list()
     while result_queue.qsize():
         item = result_queue.get()
-        sid, uname, result = item.to_tuple()
-        if is_apply_result:
-            result = result.get()
-        if isinstance(result, dict):
+        sid, uname, payload, result = item.to_tuple()
+        if isinstance(result, ErrorInformation):
             failed_list.append(item)
         else:
             sent_list.append(item)
     return sent_list, failed_list
 
 
-def group_by_result_list(
-        result_list: list[JobSentInformation], is_apply_result: bool
-) -> tuple[list[JobSentInformation], list[JobSentInformation]]:
+def separate_result_list(result_list: list[JobResponse]) -> tuple[list[JobResponse], list[JobResponse]]:
     sent_list, failed_list = list(), list()
     for job_result in result_list:
-        _, _, result = job_result.to_tuple()
-        if is_apply_result:
-            result = result.get()
-        if isinstance(result, dict):
+        _, _, _, result = job_result.to_tuple()
+        if isinstance(result, ErrorInformation):
             failed_list.append(job_result)
         else:
             sent_list.append(job_result)
@@ -67,7 +55,7 @@ def group_by_result_list(
 
 
 def evaluate_broadcast_stats(
-        sent_list: list[JobSentInformation], failed_list: list[JobSentInformation]
+        sent_list: list[JobResponse], failed_list: list[JobResponse]
 ) -> BroadcastStats:
     n_job = len(sent_list) + len(failed_list)
     n_success = len(sent_list)
