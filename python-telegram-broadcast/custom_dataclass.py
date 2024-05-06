@@ -55,19 +55,6 @@ class ErrorInformation:
     traceback: str
 
 
-BroadcastMethodArgumentType = [
-    telegram.Bot, int, str, str, float, int, int
-]
-
-BroadcastMethodReturnType = Union[
-    telegram.Message, telegram.PhotoSize, telegram.Document, telegram.Video, ErrorInformation
-]
-BroadcastMethod = Callable[
-    [*BroadcastMethodArgumentType],
-    Coroutine[Any, Any, BroadcastMethodReturnType]
-]
-
-
 @dataclass
 class JobResponse:
     """
