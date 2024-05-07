@@ -138,9 +138,9 @@ class AsyncSequential(BroadcastStrategy):
 
         # If content or caption is a string, convert it to a list of strings with the same length as subscribers
         if type(content) is str:
-            content = [content] * len(subscribers)
+            content = [content for _ in range(len(subscribers))]
         if type(caption) is str:
-            caption = [caption] * len(subscribers)
+            caption = [caption for _ in range(len(subscribers))]
 
         result_list: list[JobResponse] = []
         # Iterate over each subscriber and send the message
@@ -219,9 +219,9 @@ class AsyncProcessPool(BroadcastStrategy):
 
         # If content or caption is a string, convert it to a list of strings with the same length as subscribers
         if type(content) is str:
-            content = [content] * len(subscribers)
+            content = [content for _ in range(len(subscribers))]
         if type(caption) is str:
-            caption = [caption] * len(subscribers)
+            caption = [caption for _ in range(len(subscribers))]
 
         res_list: Queue[JobResponse] = Queue()  # Queue to store the results
         # Use a process pool executor to send messages concurrently
@@ -319,9 +319,9 @@ class AsyncMultiProcessingPool(BroadcastStrategy):
 
         # If content or caption is a string, convert it to a list of strings with the same length as subscribers
         if type(content) is str:
-            content = [content] * len(subscribers)
+            content = [content for _ in range(len(subscribers))]
         if type(caption) is str:
-            caption = [caption] * len(subscribers)
+            caption = [caption for _ in range(len(subscribers))]
 
         res_list: Queue[JobResponse] = Queue()
         with multiprocessing.Pool(processes=use_nproc) as pool:

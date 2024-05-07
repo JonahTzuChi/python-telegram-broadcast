@@ -41,9 +41,9 @@ async def handle_broadcast(
     try:
         # If content or caption is a string, convert it to a list of strings with the same length as subscribers
         if type(content) is str:
-            content = [content] * len(subscribers)
+            content = [content for _ in range(len(subscribers))]
         if type(caption) is str:
-            caption = [caption] * len(subscribers)
+            caption = [caption for _ in range(len(subscribers))]
 
         # Pick the appropriate broadcast method
         if type(broadcast_method) is BroadcastMethodType:
