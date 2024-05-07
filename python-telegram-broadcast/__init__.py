@@ -14,46 +14,51 @@ __all__ = [
 ]
 
 
-def wrapper(bt, bm, user, payload):
+def wrapper(token, method, target_id, payload):
+    caption = ""
+    seconds = 0.0  # 0.0 means no timeout
+    max_retry = 5  # Maximum retry
+
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(
         get_file_id(
-            bt, bm, user, payload, "...", 0.0, 5
+            token, method, target_id, payload, caption, seconds, max_retry
         )
     )
 
 
-def broadcast_wrapper(bt, bm, bs, sl, payload):
+def broadcast_wrapper(token, method, stg, slist, payload):
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(
         handle_broadcast(
-            sl, bt, bm, bs, payload, "...", use_multiproc=False, use_nproc=1, seconds=0.0, max_retry=5
+            slist, token, method, stg, payload, "...",
+            use_multiproc=False, use_nproc=1, seconds=0.0, max_retry=5
         )
     )
 
 
 # CLI: python3 -m python-telegram-broadcast.__init__
 if __name__ == "__main__":
-    bot_token: str
-    with open("./asset/token.txt", "r") as file:
-        bot_token = file.readline().strip()
-    print(bot_token)
+    bot_token: str = "TELEGRAM_BOT_TOKEN"   # << Change to your bot token
+    user_telegram_id: int = 123456789       # << Change to your telegram id
+    file_path: str = ""                     # << Change to your file path or the URL of your file
+
     broadcast_method = select_broadcast_method(BroadcastMethodType.PHOTO)
-    broadcast_strategy = select_broadcast_strategy(BroadcastStrategyType.ASYNCIO_SEQUENTIAL)
 
-    with open("./asset/subscriber.txt", "r") as file:
-        header = file.readline()
-        while True:
-            line = file.readline()
-            if not line:
-                break
-            telegram_id, username = line.strip().split(",")
-            print(telegram_id, username)
+    # If file_path is a URL
+    if "://" in file_path:
+        file_id = wrapper(bot_token, broadcast_method, user_telegram_id, file_path)
+    else:
+        # Otherwise
+        file_id = wrapper(bot_token, broadcast_method, user_telegram_id, open(file_path, "rb"))
 
-    file_id = wrapper(bot_token, broadcast_method, int(telegram_id), open("./asset/sample_photo.jpeg", "rb"))
     print(file_id)
 
-    subscriber_list = []
+    # Use bot_token, broadcast_method, file_path from the previous example!!!
+    export_path = ""
+    broadcast_strategy = select_broadcast_strategy(BroadcastStrategyType.ASYNCIO_SEQUENTIAL)
+    # Read subscriber list from file, but you can also read from database of your choice
+    subscriber_list: list[Tuple[int, str]] = []
     with open("./asset/subscriber.txt", "r") as file:
         header = file.readline()
         while True:
@@ -61,12 +66,7 @@ if __name__ == "__main__":
             if not line:
                 break
             telegram_id, username = line.strip().split(",")
-            print(telegram_id, username)
-
             subscriber_list.append((int(telegram_id), username))
-
-    for tid, uname in subscriber_list:
-        print(tid, uname)
 
     s, f = broadcast_wrapper(
         bot_token, broadcast_method, broadcast_strategy,
@@ -80,4 +80,4 @@ if __name__ == "__main__":
         print(f"Failed: {f}")
 
     if len(f) > 0:
-        write_sent_result(f"./asset/result_sample_photo.txt", f, "sample_photo.jpeg")
+        write_sent_result(f"{export_path}/result_{file_path}.txt", f, file_path)
