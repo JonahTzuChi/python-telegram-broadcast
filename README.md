@@ -1,4 +1,4 @@
-<img height="250" src="https://github.com/JonahTzuChi/python-telegram-broadcast/blob/main/logo.jpg" title="python-telegram-broadcast-logo" width="250"/>
+![my-logo](https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg "Python Telegram Broadcast Logo")
 
 # Python Telegram Broadcast
 
