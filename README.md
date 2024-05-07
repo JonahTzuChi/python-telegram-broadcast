@@ -23,7 +23,7 @@ This is a simple Python package that build on top of [python-telegram-bot](https
 
 ## Installation
   ```bash
-  pip3 install python-telegram-broadcast
+  pip3 install python_telegram_broadcast
   ```
 
 ## Example

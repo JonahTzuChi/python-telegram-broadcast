@@ -5,10 +5,10 @@ DESCRIPTION = 'Package that wraps the python-telegram-bot library to make broadc
 # python3 setup.py sdist bdist_wheel
 # twine upload --skip-existing dist/*
 
-VERSION = '0.7.0'
+VERSION = '0.8.0'
 
 setup(
-    name='python-telegram-broadcast',
+    name='python_telegram_broadcast',
     version=VERSION,
     packages=find_packages(),
     description=DESCRIPTION,

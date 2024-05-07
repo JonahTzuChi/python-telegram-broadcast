@@ -37,7 +37,7 @@ def broadcast_wrapper(token, method, stg, slist, payload):
     )
 
 
-# CLI: python3 -m python-telegram-broadcast.__init__
+# CLI: python3 -m python_telegram_broadcast.__init__
 if __name__ == "__main__":
     bot_token: str = "TELEGRAM_BOT_TOKEN"   # << Change to your bot token
     user_telegram_id: int = 123456789       # << Change to your telegram id
