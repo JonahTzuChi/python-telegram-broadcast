@@ -2,9 +2,14 @@ from setuptools import setup, find_packages
 
 DESCRIPTION = 'Package that wraps the python-telegram-bot library to make broadcasting easier.'
 
+# python3 setup.py sdist bdist_wheel
+# twine upload --skip-existing dist/*
+
+VERSION = '0.6'
+
 setup(
     name='python-telegram-broadcast',
-    version='0.4',
+    version=VERSION,
     packages=find_packages(),
     description=DESCRIPTION,
     long_description=open('README.md').read(),
