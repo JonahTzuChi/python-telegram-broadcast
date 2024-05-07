@@ -1,4 +1,4 @@
-![https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg](https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg logo)
+![https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg](https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg "logo")
 
 # Python Telegram Broadcast
 
