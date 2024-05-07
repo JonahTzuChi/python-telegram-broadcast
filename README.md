@@ -1,4 +1,4 @@
-![my-logo](./logo-mini.jpg "Python-Telegram-Broadcast-Logo")
+![my-logo](https://jonahtzuchi.github.io/python-telegram-broadcast/logo-mini.jpg "Python-Telegram-Broadcast-Logo")
 
 # Python Telegram Broadcast
 
