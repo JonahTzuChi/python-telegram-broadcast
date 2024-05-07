@@ -117,8 +117,8 @@ async def sendMessage(
                          f'payload: "{message}", '
                          f'elapsed_seconds: "{sent_time}"')
         raise TimedOut("{" + error_message + "}")
-    except BadRequest as bad_request_err:
-        raise TelegramSendError(target_id, "NA", message, str(bad_request_err))
+    except BadRequest:
+        raise
     except Forbidden as _:
         raise Forbidden(str(target_id))
     except TelegramError as tg_err:
@@ -194,8 +194,8 @@ async def sendPhoto(
                          f'payload: "{filename_or_url}", '
                          f'elapsed_seconds: "{sent_time}"')
         raise TimedOut("{" + error_message + "}")
-    except BadRequest as bad_request_err:
-        raise TelegramSendError(target_id, "NA", filename_or_url, str(bad_request_err))
+    except BadRequest:
+        raise
     except Forbidden as _:
         raise Forbidden(str(target_id))
     except TelegramError as tg_err:
@@ -267,8 +267,8 @@ async def sendVideo(
                          f'payload: "{filename_or_url}", '
                          f'elapsed_seconds: "{sent_time}"')
         raise TimedOut("{" + error_message + "}")
-    except BadRequest as bad_request_err:
-        raise TelegramSendError(target_id, "NA", filename_or_url, str(bad_request_err))
+    except BadRequest:
+        raise
     except Forbidden as _:
         raise Forbidden(str(target_id))
     except TelegramError as tg_err:
@@ -345,8 +345,8 @@ async def sendDocument(
                          f'payload: "{filename_or_url}", '
                          f'elapsed_seconds: "{sent_time}"')
         raise TimedOut("{" + error_message + "}")
-    except BadRequest as bad_request_err:
-        raise TelegramSendError(target_id, "NA", filename_or_url, str(bad_request_err))
+    except BadRequest:
+        raise
     except Forbidden as _:
         raise Forbidden(str(target_id))
     except TelegramError as tg_err:
