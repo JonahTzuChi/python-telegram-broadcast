@@ -1,14 +1,14 @@
 import asyncio
 from .main import handle_broadcast, get_file_id
-from .send_method import BroadcastMethodType, select_broadcast_method
-from .strategy import BroadcastStrategyType, select_broadcast_strategy
+from .send_method import BroadcastMethodType, select_broadcast_method, string_to_BroadcastMethodType
+from .strategy import BroadcastStrategyType, select_broadcast_strategy, string_to_BroadcastStrategyType
 from .custom_util import write_sent_result, evaluate_broadcast_stats
 from .custom_dataclass import JobResponse, BroadcastStats, ErrorInformation
 
 __all__ = [
     "handle_broadcast", "get_file_id",
-    "select_broadcast_method", "BroadcastMethodType",
-    "select_broadcast_strategy", "BroadcastStrategyType",
+    "select_broadcast_method", "BroadcastMethodType", "string_to_BroadcastMethodType",
+    "select_broadcast_strategy", "BroadcastStrategyType", "string_to_BroadcastStrategyType",
     "write_sent_result", "evaluate_broadcast_stats",
     "JobResponse", "BroadcastStats", "ErrorInformation"
 ]

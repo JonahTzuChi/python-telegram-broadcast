@@ -31,7 +31,7 @@ async def handle_broadcast(
         broadcast_strategy: BroadcastStrategyType | Callable[
             [...], Coroutine[Any, Any, Tuple[list[JobResponse], list[JobResponse]]]
         ],
-        content: str, caption: str, **configuration
+        content: str | list[str], caption: str | list[str], **configuration
 ) -> tuple[list[JobResponse], list[JobResponse]]:
     use_multiproc = configuration.get("use_multiproc", False)
     use_nproc = configuration.get("use_nproc", os.cpu_count())
@@ -39,6 +39,12 @@ async def handle_broadcast(
     max_retry = configuration.get("max_retry", 5)
     async_callback: Optional[Callable[[int], Coroutine[Any, Any, None]]] = configuration.get("async_callback", None)
     try:
+        # If content or caption is a string, convert it to a list of strings with the same length as subscribers
+        if type(content) is str:
+            content = [content] * len(subscribers)
+        if type(caption) is str:
+            caption = [caption] * len(subscribers)
+
         # Pick the appropriate broadcast method
         if type(broadcast_method) is BroadcastMethodType:
             broadcast_method = select_broadcast_method(broadcast_method)

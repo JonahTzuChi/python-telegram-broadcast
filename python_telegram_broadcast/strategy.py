@@ -140,7 +140,7 @@ class AsyncSequential(BroadcastStrategy):
         if type(content) is str:
             content = [content] * len(subscribers)
         if type(caption) is str:
-            caption = [caption] * len(content)
+            caption = [caption] * len(subscribers)
 
         result_list: list[JobResponse] = []
         # Iterate over each subscriber and send the message
@@ -221,7 +221,7 @@ class AsyncProcessPool(BroadcastStrategy):
         if type(content) is str:
             content = [content] * len(subscribers)
         if type(caption) is str:
-            caption = [caption] * len(content)
+            caption = [caption] * len(subscribers)
 
         res_list: Queue[JobResponse] = Queue()  # Queue to store the results
         # Use a process pool executor to send messages concurrently
@@ -229,12 +229,12 @@ class AsyncProcessPool(BroadcastStrategy):
             loop = asyncio.get_event_loop()
             futures = []
             # Iterate over each subscriber and send the message
-            for telegram_id, username in subscribers:
+            for (telegram_id, username), _payload, _caption in zip(subscribers, content, caption):
                 try:
                     # Attempt to send the message
                     future = loop.run_in_executor(
                         executor,
-                        partial(broadcast_method_wrapper, method, bot_token, telegram_id, content, caption, 0,
+                        partial(broadcast_method_wrapper, method, bot_token, telegram_id, _payload, _caption, 0,
                                 max_retry)
                     )
                     futures.append(future)
@@ -243,22 +243,22 @@ class AsyncProcessPool(BroadcastStrategy):
                 except Exception as error:
                     # If an error occurs, append the error information to the result list
                     error_info = ErrorInformation(type(error).__name__, str(error), traceback.format_exc())
-                    res_list.put(JobResponse(telegram_id, username, content, error_info))
+                    res_list.put(JobResponse(telegram_id, username, _payload, error_info))
 
             # Process the results
-            for future, (telegram_id, username) in zip(futures, subscribers):
+            for future, (telegram_id, username), _payload in zip(futures, subscribers, content):
                 try:
                     result = await future
                     res_list.put(JobResponse(telegram_id, username, content, result))
 
-                    if isinstance(result, dict):
+                    if isinstance(result, ErrorInformation):
                         continue
 
                     if success_callback:
                         await success_callback(telegram_id)
                 except Exception as error:
                     error_info = ErrorInformation(type(error).__name__, str(error), traceback.format_exc())
-                    res_list.put(JobResponse(telegram_id, username, content, error_info))
+                    res_list.put(JobResponse(telegram_id, username, _payload, error_info))
 
         # Group the results by success and failure
         sent_list, failed_list = separate_result_queue(res_list)
@@ -317,13 +317,19 @@ class AsyncMultiProcessingPool(BroadcastStrategy):
                 print(f"Number of processes exceeds the number of CPUs. Using {os.cpu_count()} processes instead.")
             use_nproc = os.cpu_count()
 
+        # If content or caption is a string, convert it to a list of strings with the same length as subscribers
+        if type(content) is str:
+            content = [content] * len(subscribers)
+        if type(caption) is str:
+            caption = [caption] * len(subscribers)
+
         res_list: Queue[JobResponse] = Queue()
         with multiprocessing.Pool(processes=use_nproc) as pool:
             results = []
-            for telegram_id, username in subscribers:
+            for (telegram_id, username), _payload, _caption in zip(subscribers, content, caption):
                 result = pool.apply_async(
                     broadcast_method_wrapper,
-                    (method, bot_token, telegram_id, content, caption, 0.0, max_retry)
+                    (method, bot_token, telegram_id, _payload, _caption, 0.0, max_retry)
                 )
                 results.append((result, telegram_id, username))
                 if seconds > 0:
@@ -331,17 +337,21 @@ class AsyncMultiProcessingPool(BroadcastStrategy):
             pool.close()
             pool.join()
 
-        for result, telegram_id, username in results:
+        for (result, telegram_id, username), _payload in zip(results, content):
             try:
                 send_result = result.get()
-                res_list.put(JobResponse(telegram_id, username, content, send_result))
+                res_list.put(JobResponse(telegram_id, username, _payload, send_result))
+
+                if isinstance(send_result, ErrorInformation):
+                    continue
+
                 if success_callback:
                     await success_callback(telegram_id)
             except Exception as error:
                 error_info = ErrorInformation(
                     type(error).__name__, str(error), traceback.format_exc()
                 )
-                res_list.put(JobResponse(telegram_id, username, content, error_info))
+                res_list.put(JobResponse(telegram_id, username, _payload, error_info))
 
         sent_list, failed_list = separate_result_queue(res_list)
         return sent_list, failed_list
