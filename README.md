@@ -1,5 +1,4 @@
-<img height="250" src="https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg" title="python-telegram-broadcast-logo" width="250"/>
-![logo](https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg)
+<img height="250" src="[https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg](https://jonahtzuchi.github.io/python-telegram-broadcast/logo.jpg)" title="python-telegram-broadcast-logo" width="250"/>
 
 # Python Telegram Broadcast
 
