@@ -40,9 +40,16 @@ async def get_file_id(
 ) -> str:
     try:
         bot = telegram.Bot(token=bot_token)
-        res: Union[telegram.Document, telegram.PhotoSize, telegram.Video] = await broadcast_method(
-            bot, dummy_user, content, caption, seconds, seconds, max_retry
-        )
+        if os.path.isfile(content):
+            with open(content, "rb") as payload:
+                res: Union[telegram.Document, telegram.PhotoSize, telegram.Video] = await broadcast_method(
+                    bot, dummy_user, payload.read(), caption, seconds, seconds, max_retry
+                )
+        else:
+            payload = content
+            res: Union[telegram.Document, telegram.PhotoSize, telegram.Video] = await broadcast_method(
+                bot, dummy_user, payload, caption, seconds, seconds, max_retry
+            )
         if seconds > 0:
             await asyncio.sleep(seconds)
         return res.file_id

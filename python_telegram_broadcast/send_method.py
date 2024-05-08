@@ -23,6 +23,7 @@ SOFTWARE.
 """
 
 import asyncio
+import os.path
 import time
 import traceback
 from enum import Enum
@@ -164,12 +165,19 @@ async def sendPhoto(
     timeout = 60
     t1 = time.time()
     try:
-        res = await bot.sendPhoto(
-            chat_id=target_id, photo=filename_or_url, caption=caption,
-            allow_sending_without_reply=True, protect_content=False,
-            read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
-            parse_mode=ParseMode.HTML,
-        )
+        if os.path.isfile(filename_or_url):
+            with open(filename_or_url, "rb") as payload:
+                res = await bot.sendPhoto(
+                    chat_id=target_id, photo=payload, caption=caption,
+                    allow_sending_without_reply=True, protect_content=False,
+                    read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
+                )
+        else:
+            res = await bot.sendPhoto(
+                chat_id=target_id, photo=filename_or_url, caption=caption,
+                allow_sending_without_reply=True, protect_content=False,
+                read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
+            )
         t2 = time.time()
         sent_time = t2 - t1
         if sent_time < seconds:
@@ -240,11 +248,19 @@ async def sendVideo(
     timeout = 300
     t1 = time.time()
     try:
-        res = await bot.sendVideo(
-            chat_id=target_id, video=filename_or_url, caption=caption,
-            allow_sending_without_reply=True, protect_content=False,
-            read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
-        )
+        if os.path.isfile(filename_or_url):
+            with open(filename_or_url, "rb") as payload:
+                res = await bot.sendVideo(
+                    chat_id=target_id, video=payload, caption=caption,
+                    allow_sending_without_reply=True, protect_content=False,
+                    read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
+                )
+        else:
+            res = await bot.sendVideo(
+                chat_id=target_id, video=filename_or_url, caption=caption,
+                allow_sending_without_reply=True, protect_content=False,
+                read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
+            )
         t2 = time.time()
         sent_time = t2 - t1
         if sent_time < seconds:
@@ -317,12 +333,20 @@ async def sendDocument(
     timeout = 120
     t1 = time.time()
     try:
-        res = await bot.sendDocument(
-            chat_id=target_id,
-            document=filename_or_url, caption=caption,
-            allow_sending_without_reply=True, protect_content=False,
-            read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
-        )
+        if os.path.isfile(filename_or_url):
+            with open(filename_or_url, "rb") as payload:
+                res = await bot.sendDocument(
+                    chat_id=target_id, document=payload, caption=caption,
+                    allow_sending_without_reply=True, protect_content=False,
+                    read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
+                )
+        else:
+            res = await bot.sendDocument(
+                chat_id=target_id,
+                document=filename_or_url, caption=caption,
+                allow_sending_without_reply=True, protect_content=False,
+                read_timeout=timeout, write_timeout=timeout, connect_timeout=timeout, pool_timeout=timeout,
+            )
         t2 = time.time()
         sent_time = t2 - t1
         if sent_time < seconds:
