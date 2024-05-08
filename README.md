@@ -57,11 +57,7 @@ if __name__ == "__main__":
   broadcast_method = select_broadcast_method(BroadcastMethodType.PHOTO)
   
   # If file_path is a URL
-  if "://" in file_path:
-    file_id = wrapper(bot_token, broadcast_method, user_telegram_id, file_path)
-  else:  
-    # Otherwise
-    file_id = wrapper(bot_token, broadcast_method, user_telegram_id, open(file_path, "rb"))
+  file_id = wrapper(bot_token, broadcast_method, user_telegram_id, file_path)
   
   print(file_id)
 ```
@@ -86,7 +82,7 @@ def broadcast_wrapper(token, method, stg, slist, payload):
     )
 
 # Use bot_token, broadcast_method, file_path from the previous example!!!
-export_path = ""
+export_path = "./asset"
 broadcast_strategy = select_broadcast_strategy(BroadcastStrategyType.ASYNCIO_SEQUENTIAL)
 # Read subscriber list from file, but you can also read from database of your choice
 subscriber_list: list[Tuple[int, str]] = []
