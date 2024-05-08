@@ -28,6 +28,7 @@ __license__ = "MIT"
 __copyright__ = "Copyright (c) 2024 Jonah Whaler"
 
 import asyncio
+from typing import Tuple
 from .main import handle_broadcast, get_file_id
 from .send_method import BroadcastMethodType, select_broadcast_method, string_to_BroadcastMethodType
 from .strategy import BroadcastStrategyType, select_broadcast_strategy, string_to_BroadcastStrategyType
@@ -68,23 +69,16 @@ def broadcast_wrapper(token, method, stg, slist, payload):
 
 # CLI: python3 -m python_telegram_broadcast.__init__
 if __name__ == "__main__":
-    bot_token: str = "TELEGRAM_BOT_TOKEN"   # << Change to your bot token
-    user_telegram_id: int = 123456789       # << Change to your telegram id
-    file_path: str = ""                     # << Change to your file path or the URL of your file
+    bot_token: str = ""                             # << Change to your bot token
+    user_telegram_id: int = 12345678                # << Change to your telegram id
+    file_path: str = "./asset/sample_photo.jpeg"    # << Change to your file path or the URL of your file
 
     broadcast_method = select_broadcast_method(BroadcastMethodType.PHOTO)
 
-    # If file_path is a URL
-    if "://" in file_path:
-        file_id = wrapper(bot_token, broadcast_method, user_telegram_id, file_path)
-    else:
-        # Otherwise
-        file_id = wrapper(bot_token, broadcast_method, user_telegram_id, open(file_path, "rb"))
-
-    print(file_id)
+    file_id = wrapper(bot_token, broadcast_method, user_telegram_id, file_path)
 
     # Use bot_token, broadcast_method, file_path from the previous example!!!
-    export_path = ""
+    export_path = "./asset"
     broadcast_strategy = select_broadcast_strategy(BroadcastStrategyType.ASYNCIO_SEQUENTIAL)
     # Read subscriber list from file, but you can also read from database of your choice
     subscriber_list: list[Tuple[int, str]] = []
