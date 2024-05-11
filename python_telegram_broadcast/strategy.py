@@ -273,7 +273,7 @@ class AsyncProcessPool(BroadcastStrategy):
             for future, (telegram_id, username), _payload in zip(futures, subscribers, content):
                 try:
                     result = await future
-                    res_list.put(JobResponse(telegram_id, username, content, result))
+                    res_list.put(JobResponse(telegram_id, username, _payload, result))
 
                     if isinstance(result, ErrorInformation):
                         continue
